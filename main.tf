@@ -85,6 +85,28 @@ subnet_id="${aws_subnet.subnetA-pub.id}"
 tags = {
   Name = "pub-zoneA"
 }
-}
+connection {
+    type        = "ssh"
+    user        = "root"  # Replace with the appropriate username for your EC2 instance
+    private_key = file("~/.ssh/id_rsa")  # Replace with the path to your private key
+    host        = self.public_ip
+  }
 
+ provisioner "remote-exec" {
+    inline = [
+      "echo 'Hello from the remote instance'",
+      "sudo yum install httpd -y",  
+      "sudo service httpd start",  
+      "sudo yum install git -y ",
+      "mkdir /mnt/git && git init && git clone "  
+    ]
+  }
+  # File provisioner to copy a file from local to the remote EC2 instance
+  provisioner "file" {
+    source      = "index.html"  # Replace with the path to your local file
+    destination = "/var/www/html/"  # Replace with the path on the remote instance
+  }
+
+ 
+}
 
